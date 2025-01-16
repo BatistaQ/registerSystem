@@ -8,12 +8,71 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    private static int sum = 1;
+    private static String outputPath = "C:\\Users\\Kauan\\Desktop\\Projeto Java\\Register System\\form.txt";
+    private static ArrayList<Data> dataList = new ArrayList<>();
     public static void main(String[] args) {
-        String path = "C:\\Users\\Kauan\\Desktop\\Projeto Java\\Register System\\form.txt";
+        Scanner sc = new Scanner(System.in);
 
+        while(true){
+            System.out.println("Menu: ");
+            System.out.println("1 - Register User");
+            System.out.println("2 - List all registered users");
+            System.out.println("3 - Register new question in the form");
+            System.out.println("4 - Delete question from form");
+            System.out.println("5 - Search user by name, email or age");
+            System.out.println();
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))){
-            Scanner sc = new Scanner(System.in);
+            System.out.print("Choose an option: ");
+            int option = sc.nextInt();
+            sc.nextLine();
+            
+            switch (option){
+                case 1:
+                    registerUser(sc);
+                    break;
+                case 2:
+                    listAll();
+                    break;
+                case 3:
+                    newQuestion();
+                    break;
+                case 4:
+                    deleteQuestion();
+                    break;
+                case 5:
+                    searchUser(sc);
+                    break;
+            }
+        }
+    }
+
+    private static void searchUser(Scanner sc) {
+
+    }
+
+    private static void deleteQuestion() {
+    }
+
+    private static void newQuestion() {
+    }
+
+    private static void listAll() {
+        if (dataList.isEmpty()){
+            System.out.println("No registered users");
+            System.out.println();
+            return;
+        }
+
+        System.out.println("Registered users:");
+        for (int i = 0; i < dataList.size(); i++) {
+            System.out.println(i + 1 + " - " + dataList.get(i).getName());
+        }
+        System.out.println();
+    }
+
+    private static void registerUser(Scanner sc) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(outputPath))){
 
             String line;
             List<String> dataArray = new ArrayList<>();
@@ -28,12 +87,8 @@ public class Main {
             int age = Integer.parseInt(dataArray.get(2));
             double height = Double.parseDouble(dataArray.get(3));
 
-            //Data data = new Data(name,email,age,height);
-
             Data data = new Data(name,email,age,height);
-            ArrayList<Data> datas = new ArrayList<>();
-            datas.add(data);
-
+            dataList.add(data);
 
             System.out.println();
             System.out.println(name);
@@ -41,26 +96,12 @@ public class Main {
             System.out.println(age);
             System.out.println(height);
 
-            String formattedName = data.getName().replace(" ","").toUpperCase();
-            String outputFile = datas.indexOf(data) + 1 + "-" + formattedName + ".txt";
-            System.out.println(outputFile);
+            System.out.println();
 
-            try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile))){
-                bufferedWriter.write("Nome:" + data.getName());
-                bufferedWriter.newLine();
-                bufferedWriter.write("Email:" + data.getEmail());
-                bufferedWriter.newLine();
-                bufferedWriter.write("Idade:" + data.getAge());
-                bufferedWriter.newLine();
-                bufferedWriter.write("Altura:" + data.getHeight());
-            } catch (IOException e){
-                System.out.println("Erro ao acessar o arquivo: " + e.getMessage());
-            }
-
+            writeFile(data);
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
-
     }
 
     private static String validateInput(String line, Scanner sc) {
@@ -84,5 +125,27 @@ public class Main {
                 return input;
             }
         }
+    }
+
+    private static void writeFile(Data data) {
+
+        String formattedName = data.getName().replace(" ","").toUpperCase();
+        String outputFile = sum + "-" + formattedName + ".txt";
+
+        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputFile))){
+            bufferedWriter.write("Nome: " + data.getName());
+            bufferedWriter.newLine();
+            bufferedWriter.write("Email: " + data.getEmail());
+            bufferedWriter.newLine();
+            bufferedWriter.write("Idade: " + data.getAge());
+            bufferedWriter.newLine();
+            bufferedWriter.write("Altura: " + data.getHeight());
+
+            System.out.println("User saved successfully!");
+            System.out.println();
+        } catch (IOException e){
+            System.out.println("Error saving file: " + e.getMessage());
+        }
+        sum++;
     }
 }
