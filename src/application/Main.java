@@ -35,7 +35,7 @@ public class Main {
                     listAll();
                     break;
                 case 3:
-                    newQuestion();
+                    newQuestion(sc);
                     break;
                 case 4:
                     deleteQuestion();
@@ -47,37 +47,13 @@ public class Main {
         }
     }
 
-    private static void searchUser(Scanner sc) {
-
-    }
-
-    private static void deleteQuestion() {
-    }
-
-    private static void newQuestion() {
-    }
-
-    private static void listAll() {
-        if (dataList.isEmpty()){
-            System.out.println("No registered users");
-            System.out.println();
-            return;
-        }
-
-        System.out.println("Registered users:");
-        for (int i = 0; i < dataList.size(); i++) {
-            System.out.println(i + 1 + " - " + dataList.get(i).getName());
-        }
-        System.out.println();
-    }
-
     private static void registerUser(Scanner sc) {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(outputPath))){
 
             String line;
             List<String> dataArray = new ArrayList<>();
 
-            while((line =bufferedReader.readLine()) != null){
+            while((line = bufferedReader.readLine()) != null){
                 System.out.println(line);
                 dataArray.add(validateInput(line,sc));
             }
@@ -103,18 +79,17 @@ public class Main {
             System.out.println(e.getMessage());
         }
     }
-
     private static String validateInput(String line, Scanner sc) {
         while(true){
             String input = sc.nextLine();
-            if (line.contains("idade")){
+            if (line.contains("sua idade")){
                 try {
                     Integer.parseInt(input);
                     return input;
                 } catch (NumberFormatException e){
                     System.out.println("Por favor, insira um número inteiro válido para idade.");
                 }
-            } else if (line.contains("altura")){
+            } else if (line.contains("sua altura")){
                 try {
                     Double.parseDouble(input);
                     return input;
@@ -147,5 +122,39 @@ public class Main {
             System.out.println("Error saving file: " + e.getMessage());
         }
         sum++;
+    }
+
+    private static void listAll() {
+        if (dataList.isEmpty()){
+            System.out.println("No registered users");
+            System.out.println();
+            return;
+        }
+
+        System.out.println("Registered users:");
+        for (int i = 0; i < dataList.size(); i++) {
+            System.out.println(i + 1 + " - " + dataList.get(i).getName());
+        }
+        System.out.println();
+    }
+
+    private static void newQuestion(Scanner sc) {
+        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputPath,true))){
+            System.out.print("Digite a nova pergunta: ");
+            String question = sc.nextLine();
+
+            bufferedWriter.write(question);
+            bufferedWriter.newLine();
+        } catch (IOException e){
+            System.out.println("Erro ao adicionar a pergunta: " + e.getMessage());
+        }
+    }
+
+    private static void deleteQuestion() {
+
+    }
+
+    private static void searchUser(Scanner sc) {
+
     }
 }
