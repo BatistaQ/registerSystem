@@ -38,7 +38,7 @@ public class Main {
                     newQuestion(sc);
                     break;
                 case 4:
-                    deleteQuestion();
+                    deleteQuestion(sc);
                     break;
                 case 5:
                     searchUser(sc);
@@ -150,8 +150,42 @@ public class Main {
         }
     }
 
-    private static void deleteQuestion() {
+    private static void deleteQuestion(Scanner sc) {
+        List<String> questions = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(outputPath))){
+            String line;
+            while((line = br.readLine()) != null){
+                questions.add(line);
+            }
+        } catch (IOException e){
+            System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+        }
+        for (int i = 4; i < questions.size(); i++){
+            System.out.println(questions.get(i));
+        }
 
+        System.out.print("Escolha um número da pergunta para excluir: ");
+        int choice = sc.nextInt();
+        System.out.println();
+
+        if (choice < 5 || choice > questions.size()){
+            System.out.println("Opção inválida. Delete a partir da pergunta numero 5.");
+            System.out.println();
+        } else {
+            questions.remove(choice - 1);
+            System.out.println("Pergunta removida com sucesso!");
+        }
+
+        try(BufferedWriter bf = new BufferedWriter(new FileWriter(outputPath))){
+            for(String question : questions){
+                bf.write(question);
+                bf.newLine();
+            }
+        } catch (IOException e){
+            System.out.println("Erro ao escrever arquivo: " + e.getMessage());
+        }
+
+        System.out.println();
     }
 
     private static void searchUser(Scanner sc) {
