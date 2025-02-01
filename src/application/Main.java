@@ -4,6 +4,7 @@ import entities.Data;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -145,6 +146,9 @@ public class Main {
 
             bufferedWriter.write(question);
             bufferedWriter.newLine();
+
+            System.out.println("Pergunta adicionada com sucesso!");
+            System.out.println();
         } catch (IOException e){
             System.out.println("Erro ao adicionar a pergunta: " + e.getMessage());
         }
@@ -159,22 +163,35 @@ public class Main {
             }
         } catch (IOException e){
             System.out.println("Erro ao ler o arquivo: " + e.getMessage());
+            return;
         }
+        System.out.println("Perguntas que podem ser removidas:");
         for (int i = 4; i < questions.size(); i++){
             System.out.println(questions.get(i));
         }
+        System.out.println();
 
-        System.out.print("Escolha um número da pergunta para excluir: ");
+        System.out.print("Escolha o número da pergunta que deseja excluir: ");
+
+        //Verificar entrada
+        if (!sc.hasNextInt()){
+            System.out.println("Entrada inválida. Digite um número válido");
+            sc.nextLine();
+            return;
+        }
+
         int choice = sc.nextInt();
+        sc.nextLine();
         System.out.println();
 
         if (choice < 5 || choice > questions.size()){
             System.out.println("Opção inválida. Delete a partir da pergunta numero 5.");
-            System.out.println();
-        } else {
-            questions.remove(choice - 1);
-            System.out.println("Pergunta removida com sucesso!");
+            return;
         }
+
+        questions.remove(choice - 1);
+        System.out.println("Pergunta removida com sucesso!");
+
 
         try(BufferedWriter bf = new BufferedWriter(new FileWriter(outputPath))){
             for(String question : questions){
@@ -189,6 +206,47 @@ public class Main {
     }
 
     private static void searchUser(Scanner sc) {
+        System.out.print("Digite o termo para buscar (nome,email ou idade): ");
+        String searchTerm = sc.nextLine().toLowerCase();
 
+        List<Data> matchedUsers = new ArrayList<>();
+
+        for (Data user : dataList){
+            //Separa o nome para verificar posteriormente
+            String[] nameParts = user.getName().toLowerCase().split(" ");
+
+            boolean matches = false;
+
+            for (String part : nameParts){
+                if (part.startsWith(searchTerm)) {
+                    matches = true;
+                    break;
+                }
+            }
+
+            if (matches ||
+                user.getEmail().toLowerCase().contains(searchTerm) ||
+                String.valueOf(user.getAge()).contains(searchTerm)){
+
+                matchedUsers.add(user);
+            }
+        }
+
+        if (matchedUsers.isEmpty()){
+            System.out.println("Nenhum usuário encontrado.");
+            System.out.println();
+        } else {
+            matchedUsers.sort(Comparator.comparing(Data::getName)); //Ordernar por A-Z
+            System.out.println("Usuários encontrados:");
+
+            for (Data user : matchedUsers){
+                System.out.println("Nome: " + user.getName());
+                System.out.println("Email: " + user.getEmail());
+                System.out.println("Idade: " + user.getAge());
+                System.out.println("Altura: " + user.getHeight());
+                System.out.println();
+            }
+            System.out.println();
+        }
     }
 }
