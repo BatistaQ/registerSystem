@@ -179,12 +179,28 @@ public class Main {
         System.out.println();
     }
 
-    private static void newQuestion(Scanner sc) {
-        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputPath,true))){
-            System.out.print("Digite a nova pergunta: ");
-            String question = sc.nextLine();
+    private static int numQuestions;
+    private static void verifyQuestions(){
+        numQuestions = 0;
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(outputPath))){
+            String line;
+            while((line = bufferedReader.readLine()) != null){
+                System.out.println(line);
+                numQuestions ++;
+            }
+        } catch (IOException e){
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
 
-            bufferedWriter.write(question);
+    private static void newQuestion(Scanner sc) {
+        verifyQuestions();
+        int questionNumber = numQuestions + 1;
+        try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputPath,true))){
+            System.out.println("Digite a nova pergunta:");
+            System.out.print(questionNumber + " - ");
+            String question = sc.nextLine();
+            bufferedWriter.write(questionNumber + " - " + question);
             bufferedWriter.newLine();
 
             System.out.println("Pergunta adicionada com sucesso!");
