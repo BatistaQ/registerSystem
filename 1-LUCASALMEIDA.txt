@@ -1,4 +1,0 @@
-Nome: Lucas Almeida
-Email: lucas@gmail.com
-Idade: 21
-Altura: 172.0

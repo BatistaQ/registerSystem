@@ -1,33 +1,37 @@
 package application;
 
 import entities.Data;
+import entities.exceptions.InvalidAgeException;
+import entities.exceptions.InvalidEmailException;
+import entities.exceptions.InvalidHeightException;
+import entities.exceptions.InvalidNameException;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.*;
 
 public class Main {
     private static int sum = 1;
     private static String outputPath = "C:\\Users\\Kauan\\Desktop\\Projeto Java\\Register System\\form.txt";
     private static ArrayList<Data> dataList = new ArrayList<>();
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
         while(true){
+
             System.out.println("Menu: ");
             System.out.println("1 - Register User");
             System.out.println("2 - List all registered users");
             System.out.println("3 - Register new question in the form");
             System.out.println("4 - Delete question from form");
             System.out.println("5 - Search user by name, email or age");
-            System.out.println();
-
             System.out.print("Choose an option: ");
-            int option = sc.nextInt();
+
+            int option = getValidInteger(sc);
             sc.nextLine();
-            
+
             switch (option){
                 case 1:
                     registerUser(sc);
@@ -48,6 +52,15 @@ public class Main {
         }
     }
 
+    private static int getValidInteger(Scanner sc) {
+        while(!sc.hasNextInt()){
+            System.out.println("Invalid input.");
+            sc.next();
+        }
+        return sc.nextInt();
+    }
+
+    private static List<String> registeredEmails = new ArrayList<>();
     private static void registerUser(Scanner sc) {
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(outputPath))){
 
@@ -56,7 +69,7 @@ public class Main {
 
             while((line = bufferedReader.readLine()) != null){
                 System.out.println(line);
-                dataArray.add(validateInput(line,sc));
+                dataArray.add(validateInput(line,sc)); //chama a validação dos dados antes de adicionar ao array
             }
 
             String name = dataArray.get(0);
@@ -66,16 +79,9 @@ public class Main {
 
             Data data = new Data(name,email,age,height);
             dataList.add(data);
-
-            System.out.println();
-            System.out.println(name);
-            System.out.println(email);
-            System.out.println(age);
-            System.out.println(height);
-
-            System.out.println();
-
+            registeredEmails.add(email);
             writeFile(data);
+
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
@@ -83,23 +89,57 @@ public class Main {
     private static String validateInput(String line, Scanner sc) {
         while(true){
             String input = sc.nextLine();
-            if (line.contains("sua idade")){
-                try {
-                    Integer.parseInt(input);
-                    return input;
-                } catch (NumberFormatException e){
-                    System.out.println("Por favor, insira um número inteiro válido para idade.");
-                }
-            } else if (line.contains("sua altura")){
-                try {
-                    Double.parseDouble(input);
-                    return input;
-                } catch (NumberFormatException e){
-                    System.out.println("Por favor, insira um número decimal válido para altura.");
-                }
-            } else {
-                return input;
+
+            if (line.contains("seu nome")){
+                validateName(input);
             }
+            else if (line.contains("email")){
+                validateEmail(input);
+            }
+            else if (line.contains("idade")){
+                validateAge(input);
+            }
+            else if (line.contains("altura")){
+                validateHeight(input);
+            }
+
+            return input;
+        }
+    }
+
+    private static void validateName(String input) throws InvalidNameException {
+        if(input.replaceAll("\\s+","").length() < 10){
+            throw new InvalidNameException("O nome deve ter pelo menos 10 caracteres.");
+        }
+    }
+
+
+    private static void validateEmail(String input) throws InvalidEmailException {
+        if (!input.contains("@")){
+            throw new InvalidEmailException("O email deve conter @");
+        }
+
+        if (registeredEmails.contains(input)){
+            throw new InvalidEmailException("O email já foi cadastrado.");
+        }
+    }
+
+    private static void validateAge(String input) throws InvalidAgeException {
+        try {
+            int age = Integer.parseInt(input);
+            if (age < 18){
+                throw new InvalidAgeException("Usuario deve ter no minimo 18 anos.");
+            }
+        } catch (InputMismatchException e){
+            System.out.println("Insira um número válido para idade.");
+        }
+    }
+
+    private static void validateHeight(String input) throws InvalidHeightException{
+        try {
+            Double.parseDouble(input);
+        } catch (NumberFormatException e){
+            System.out.println("Insira um número válido para altura.");
         }
     }
 

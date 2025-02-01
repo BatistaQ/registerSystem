@@ -1,4 +1,0 @@
-Nome: Luca De Sá
-Email: lucas2@gmail.com
-Idade: 18
-Altura: 178.0
